@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokédex</title>
+    <link rel="shortcut icon" href="Loader.svg">
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js" defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style media="screen">
+      @font-face {
+        font-family: Lato;
+        src: url('http://fonts.googleapis.com/css?family=Lato');
+      }
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat');
+      @keyframes loaded {
+        from { opacity: 1; }
+        to { opacity: 0; display: none; z-index: -1; }
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      body {
+        background: #F9F9F9;
+        margin: 0px;
+        overflow-y: hidden;
+      }
+      button, input[type="button"] {
+        padding: 12px 16px;
+        font-family: 'Lato', sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: #FFF;
+        background: #F22539;
+        border-radius: 60px;
+        border-style: none;
+        cursor: pointer;
+      }
+      footer {
+        text-align: center;
+        padding: 16px 0px;
+        padding-bottom: 0px;
+        height: max(10%,64px);
+        background: white;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        margin: 0;
+        box-shadow: 0px -5px 4px rgba(0, 0, 0, 0.05);
+      }
+      h1 {
+        font-family: 'Lato', sans-serif;
+        font-size: 36px;
+        font-weight: 700;
+        color: #353535;
+      }
+      header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 32px 0px 0px 0px;
+      }
+      input[type="checkbox"] {
+        margin: 0px;
+        width: 44px;
+        height: 40px;
+        opacity: 0;
+        cursor: pointer;
+      }
+      input[type="text"] {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 16px;
+        padding: 8px;
+        border-radius: 5px;
+        border: 0px;
+        width: 92%;
+        outline: 0px;
+      }
+      label {
+        background: url('Disabled.svg');
+      }
+      main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 24px;
+        margin-bottom: 72px;
+      }
+      span {
+        font-family: 'Lato', sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        color: #5E5E5E;
+        width: 50%;
+        text-align: center;
+        margin: 0%;
+      }
+      .fa-search {
+        color: #BFBFBF;
+        font-size: 18px;
+      }
+      .footer-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
+      .footer-buttons > button {
+        margin: 0px 8px;
+        flex-basis: 25%;
+      }
+      .logo {
+        display: flex;
+      }
+      .name {
+        font-size: 22px;
+        font-family: 'Lato', sans-serif;
+        color: #353535;
+        text-align: left;
+        cursor: pointer;
+      }
+      .pokemon {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        margin: 8px 0px;
+        width: 50%;
+        padding: 16px;
+        border-radius: 5px;
+      }
+      .pokemons {
+        padding: 0px;
+      }
+      .pokemons > li {
+        list-style-type: none;
+      }
+      #info-close {
+        position: fixed;
+        right: 0;
+        padding: 8px;
+        color: white;
+        font-size: 32px;
+        cursor: pointer;
+      }
+      #not-found {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      #not-found > h1 {
+        margin: 0px;
+      }
+      #not-found > p {
+        font-family: 'Lato', sans-serif;
+        font-size: 20px;
+        font-weight: 500;
+        color: #5E5E5E;
+        margin: 16px 0px 24px 0px;
+      }
+      #overlay {
+        width: 100%;
+        height: 100%;
+        background: #0008;
+        z-index: 9;
+        position: fixed;
+        left: 0;
+        top: 0;
+        display: none;
+      }
+      #pikachu {
+        z-index: 2;
+        background: url('Ellipse 10.svg');
+        background-repeat: no-repeat;
+        background-position: 40px 54px;
+        padding-bottom: 4px;
+        transform: translate(10px,0px);
+      }
+      #pokemon-info {
+        z-index: 7;
+        width: 50%;
+        height: 65%;
+        background: white;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+        display: none;
+      }
+      #pokemon-info > iframe {
+        width: 100%;
+        height: 100%;
+        border: 0px;
+      }
+      #preloader {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: #fff;
+        z-index: 10;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #preloader > img {
+        position: fixed;
+        animation: spin 2s linear infinite;
+      }
+      #search-bar {
+        display:flex;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.04);
+        background: #FFF;
+        padding: 8px 16px;
+        margin-bottom: 16px;
+        width: 50%;
+        align-items: center;
+        border-radius: 5px;
+      }
+      @media screen and (max-width: 691px) {
+        #pokemon-info {
+          width: 80%;
+          height: 65%;
+        }
+      }
+      @media screen and (max-width: 479px) {
+        span {
+          font-size: 22px;
+        }
+        .footer-buttons > button {
+          margin: 0px 8px;
+          flex-basis: 50%;
+        }
+        .pokemon {
+          padding: 8px 8px 8px 12px;
+          margin: 4px 0px;
+        }
+        #pokemon-info {
+          width: 90%;
+          height: 65%;
+        }
+        #search-bar, .pokemon {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body onload="loaded()">
+    <div id="preloader">
+      <img src="Loader.svg" alt="">
+    </div>
+    <main id="app">
+      <!--header-->
+      <div id="search-bar">
+        <i class="fa fa-search"></i>
+        <input type="text" placeholder="Search" id="search-input" v-model="search" onkeyup="checkDivs()">
+      </div>
+      <div class="pokemon" v-for="pokemon in pokemons" v-if="pokemon.name.indexOf(search) > -1 && pokemon.fav >= onlyfav">
+        <span class="name" onclick="openInfo(this.innerHTML)">{{ pokemon.name | capitalize }}</span>
+        <label :id="pokemon.name+'label'" v-if="pokemon.fav == false" style="background: url('Disabled.svg');">
+          <input :id="pokemon.name+'checkbox'" type="checkbox" v-model="pokemon.fav" onchange="checkFavs(this)">
+        </label>
+        <label :id="pokemon.name+'label'" v-else style="background: url('Active.svg');">
+          <input :id="pokemon.name+'checkbox'" type="checkbox" v-model="pokemon.fav" onchange="checkFavs(this)">
+        </label>
+      </div>
+      <div id="not-found" v-if="this.previousElementSibling != '[object HTMLDivElement]'">
+        <h1>Uh-oh!</h1>
+        <p>You look lost on your journey!</p>
+        <button type="button" name="button" onclick="goBackHome()">Go back home</button>
+      </div>
+      <footer>
+        <div class="footer-buttons">
+          <button id="all-pokemon" type="button" name="button" @click="onlyfav=false" onclick="checkFavBttn(this.id)"><i class="fa fa-list-ul" aria-hidden="true"></i>&nbsp;&nbsp;All</button>
+          <button id="fav-pokemon" type="button" name="button" @click="onlyfav=true" onclick="checkFavBttn(this.id)"><i class="fa fa-star" aria-hidden="true"></i>&nbsp;&nbsp;Favorites</button>
+        </div>
+        <span id="aaa"></span>
+      </footer>
+    </main>
+    <div id="overlay" onclick="closeInfo()">
+      <div id="pokemon-info">
+        <i id="info-close" class="fa fa-times-circle" aria-hidden="true" onclick="closeInfo()"></i>
+        <iframe id="iframe-info" src="info.html?name=bulbasaur" width="" height=""></iframe>
+      </div>
+    </div>
+    <script type="text/javascript">
+      favorites = 0;
+      favBttn = 0;
+      function loaded() {
+        document.getElementById('preloader').style.animation = "loaded 0.5s ease 1 forwards";
+        document.body.style.overflowY = "auto";
+        checkDivs();
+      }
+      function closeInfo() {
+        document.getElementById('overlay').style.display = "none";
+        document.getElementById('pokemon-info').style.display = "none";
+        document.body.style.overflowY = "auto";
+      }
+      function openInfo(name) {
+        document.getElementById('iframe-info').src = "info.html?name="+name.toLowerCase();
+        document.getElementById('overlay').style.display = "block";
+        document.getElementById('pokemon-info').style.display = "block";
+        document.body.style.overflowY = "hidden";
+      }
+      function checkFavs(src) {
+        label = document.getElementById(src.id.replace('checkbox','label'));
+        if (src.checked == true) {
+          favorites += 1;
+          label.style.background = "url(Active.svg)";
+        }else{
+          favorites -= 1;
+          label.style.background = "url(Disabled.svg)";
+        }
+      }
+      function checkFavBttn(n) {
+        if (n == "fav-pokemon") {
+          favBttn = 1;
+          checkDivs();
+        }else{
+          favBttn = 0;
+          hideMessage();
+        }
+      }
+    </script>
+    <script src="./js/components/pokemon.js" defer></script>
+    <script src="./js/app.js" defer></script>
+    <script type="text/javascript">
+      function checkDivs() {
+      notFound = document.getElementById('not-found');
+      searchImput = document.getElementById('search-input');
+        if (document.getElementsByClassName('pokemon').length === 0) {
+          notFound.style.display = 'flex';
+        }else{
+          hideMessage();
+        }
+      }
+      function hideMessage() {
+        searchImput = document.getElementById('search-input');
+        if (searchImput.value == "") {
+          notFound = document.getElementById('not-found');
+          notFound.style.display = 'none';
+        }
+      }
+      function goBackHome() {
+        location.href = "menu.html";
+      }
+    </script>
+  </body>
+</html>
