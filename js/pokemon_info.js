@@ -44,7 +44,7 @@ const app = new Vue({
       for (let i = 0; i < typeName.length; i++) {
         typeName[i] = typeName[i][0].toUpperCase() + typeName[i].substr(1);
       }
-      navigator.clipboard.writeText("Name: "+nameCap+"\nWeight: "+this.weight+"\nHeight: "+this.height+"\nTypes: "+typeName.join(", "));
+      navigator.clipboard.write("Name: "+nameCap+"\nWeight: "+this.weight+"\nHeight: "+this.height+"\nTypes: "+typeName.join(", "));
     }
   }
 });
