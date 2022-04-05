@@ -275,7 +275,7 @@
         <input type="text" placeholder="Search" id="search-input" v-model="search">
       </div>
       <div id="container">
-        <div class="pokemon" v-for="pokemon in pokemons" v-if="pokemon.name.indexOf(search) > -1 && pokemon.fav >= onlyfav">
+        <div class="pokemon" v-for="pokemon in pokemons" v-if="pokemon.name.indexOf(search.toLowerCase()) > -1 && pokemon.fav >= onlyfav">
           <span class="name" onclick="openInfo(this.innerHTML)">{{ pokemon.name | capitalize }}</span>
           <label :id="pokemon.name+'label'" v-if="pokemon.fav == false" style="background: url('Disabled.svg');">
             <input :id="pokemon.name+'checkbox'" type="checkbox" v-model="pokemon.fav" onchange="checkFavs(this)">
