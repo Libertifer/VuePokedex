@@ -35,7 +35,7 @@
         font-size: 18px;
         font-weight: 700;
         color: #FFF;
-        background: #F22539;
+        background-color: #F22539;
         border-radius: 60px;
         border-style: none;
         cursor: pointer;
@@ -139,6 +139,16 @@
       }
       .pokemons > li {
         list-style-type: none;
+      }
+      #all-pokemon {
+        background-color: #BFBFBF;
+        cursor: auto;
+      }
+      #container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
       #info-close {
         position: fixed;
@@ -251,6 +261,10 @@
     </style>
   </head>
   <body onload="loaded()">
+    <audio id="audio-fav" src="fav.mp3"></audio>
+    <audio id="audio-unfav" src="unfav.mp3"></audio>
+    <audio id="audio-info" src="info.mp3"></audio>
+    <audio id="audio-button" src="button.ogg"></audio>
     <div id="preloader">
       <img src="Loader.svg" alt="">
     </div>
@@ -258,26 +272,28 @@
       <!--header-->
       <div id="search-bar">
         <i class="fa fa-search"></i>
-        <input type="text" placeholder="Search" id="search-input" v-model="search" onkeyup="checkDivs()">
+        <input type="text" placeholder="Search" id="search-input" v-model="search">
       </div>
-      <div class="pokemon" v-for="pokemon in pokemons" v-if="pokemon.name.indexOf(search) > -1 && pokemon.fav >= onlyfav">
-        <span class="name" onclick="openInfo(this.innerHTML)">{{ pokemon.name | capitalize }}</span>
-        <label :id="pokemon.name+'label'" v-if="pokemon.fav == false" style="background: url('Disabled.svg');">
-          <input :id="pokemon.name+'checkbox'" type="checkbox" v-model="pokemon.fav" onchange="checkFavs(this)">
-        </label>
-        <label :id="pokemon.name+'label'" v-else style="background: url('Active.svg');">
-          <input :id="pokemon.name+'checkbox'" type="checkbox" v-model="pokemon.fav" onchange="checkFavs(this)">
-        </label>
+      <div id="container">
+        <div class="pokemon" v-for="pokemon in pokemons" v-if="pokemon.name.indexOf(search) > -1 && pokemon.fav >= onlyfav">
+          <span class="name" onclick="openInfo(this.innerHTML)">{{ pokemon.name | capitalize }}</span>
+          <label :id="pokemon.name+'label'" v-if="pokemon.fav == false" style="background: url('Disabled.svg');">
+            <input :id="pokemon.name+'checkbox'" type="checkbox" v-model="pokemon.fav" onchange="checkFavs(this)">
+          </label>
+          <label :id="pokemon.name+'label'" v-else style="background: url('Active.svg');">
+            <input :id="pokemon.name+'checkbox'" type="checkbox" v-model="pokemon.fav" onchange="checkFavs(this)">
+          </label>
+        </div>
       </div>
-      <div id="not-found" v-if="this.previousElementSibling != '[object HTMLDivElement]'">
+      <div id="not-found" v-if="isEmpty">
         <h1>Uh-oh!</h1>
         <p>You look lost on your journey!</p>
-        <button type="button" name="button" onclick="goBackHome()">Go back home</button>
+        <button type="button" name="button" @click="goBackHome">Go back home</button>
       </div>
       <footer>
         <div class="footer-buttons">
-          <button id="all-pokemon" type="button" name="button" @click="onlyfav=false" onclick="checkFavBttn(this.id)"><i class="fa fa-list-ul" aria-hidden="true"></i>&nbsp;&nbsp;All</button>
-          <button id="fav-pokemon" type="button" name="button" @click="onlyfav=true" onclick="checkFavBttn(this.id)"><i class="fa fa-star" aria-hidden="true"></i>&nbsp;&nbsp;Favorites</button>
+          <button id="all-pokemon" type="button" name="button" @click="onlyfav=false" onclick="toggleButton(0)"><i class="fa fa-list-ul" aria-hidden="true"></i>&nbsp;&nbsp;All</button>
+          <button id="fav-pokemon" type="button" name="button" @click="onlyfav=true" onclick="toggleButton(1)"><i class="fa fa-star" aria-hidden="true"></i>&nbsp;&nbsp;Favorites</button>
         </div>
         <span id="aaa"></span>
       </footer>
@@ -289,12 +305,10 @@
       </div>
     </div>
     <script type="text/javascript">
-      favorites = 0;
-      favBttn = 0;
       function loaded() {
         document.getElementById('preloader').style.animation = "loaded 0.5s ease 1 forwards";
         document.body.style.overflowY = "auto";
-        checkDivs();
+        //checkDivs();
       }
       function closeInfo() {
         document.getElementById('overlay').style.display = "none";
@@ -302,6 +316,7 @@
         document.body.style.overflowY = "auto";
       }
       function openInfo(name) {
+        playSound(2);
         document.getElementById('iframe-info').src = "info.html?name="+name.toLowerCase();
         document.getElementById('overlay').style.display = "block";
         document.getElementById('pokemon-info').style.display = "block";
@@ -310,45 +325,49 @@
       function checkFavs(src) {
         label = document.getElementById(src.id.replace('checkbox','label'));
         if (src.checked == true) {
-          favorites += 1;
+          playSound(0);
           label.style.background = "url(Active.svg)";
         }else{
-          favorites -= 1;
+          playSound(1);
           label.style.background = "url(Disabled.svg)";
         }
       }
-      function checkFavBttn(n) {
-        if (n == "fav-pokemon") {
-          favBttn = 1;
-          checkDivs();
+      function toggleButton(n) {
+        if (n == 0) {
+          document.getElementById('all-pokemon').style.backgroundColor = "#BFBFBF";
+          document.getElementById('fav-pokemon').style.backgroundColor = "#F22539";
+          document.getElementById('all-pokemon').style.cursor = "auto";
+          document.getElementById('fav-pokemon').style.cursor = "pointer";
         }else{
-          favBttn = 0;
-          hideMessage();
+          document.getElementById('all-pokemon').style.backgroundColor = "#F22539";
+          document.getElementById('fav-pokemon').style.backgroundColor = "#BFBFBF";
+          document.getElementById('all-pokemon').style.cursor = "pointer";
+          document.getElementById('fav-pokemon').style.cursor = "auto";
         }
+        playSound(3);
+      }
+      function playSound(n) {
+        var audio = [];
+        switch (n) {
+          case 0:
+            audio = document.getElementById('audio-fav');
+            break;
+          case 1:
+            audio = document.getElementById('audio-unfav');
+            break;
+          case 2:
+            audio = document.getElementById('audio-info');
+            break;
+          case 3:
+            audio = document.getElementById('audio-button');
+            break;
+          default:
+            break;
+        }
+        audio.play();
       }
     </script>
     <script src="./js/components/pokemon.js" defer></script>
     <script src="./js/app.js" defer></script>
-    <script type="text/javascript">
-      function checkDivs() {
-      notFound = document.getElementById('not-found');
-      searchImput = document.getElementById('search-input');
-        if (document.getElementsByClassName('pokemon').length === 0) {
-          notFound.style.display = 'flex';
-        }else{
-          hideMessage();
-        }
-      }
-      function hideMessage() {
-        searchImput = document.getElementById('search-input');
-        if (searchImput.value == "") {
-          notFound = document.getElementById('not-found');
-          notFound.style.display = 'none';
-        }
-      }
-      function goBackHome() {
-        location.href = "menu.html";
-      }
-    </script>
   </body>
 </html>
