@@ -11,7 +11,8 @@ let app = new Vue({
   data: {
     pokemons: [],
     search: '',
-    onlyfav: false
+    onlyfav: false,
+    isEmpty: !(document.getElementById(`container`).children.length)
   },
   mounted() { // when the Vue app is booted up, this is run automatically.
     var self = this;
@@ -23,13 +24,14 @@ let app = new Vue({
       }
     });
   },
+  updated() {
+    this.isEmpty = !(document.getElementById(`container`).children.length)
+  },
   methods: {
-    turnFav(n) {
-      if (this.pokemons[n].fav == 0) {
-        this.pokemons[n].fav = 1;
-      }else{
-        this.pokemons[n].fav = 0;
-      }
+    goBackHome: function() {
+      this.search = "";
+      this.onlyfav = false;
+      toggleButton(0);
     }
   }
 });
