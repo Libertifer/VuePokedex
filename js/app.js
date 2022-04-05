@@ -25,7 +25,8 @@ let app = new Vue({
     });
   },
   updated() {
-    this.isEmpty = !(document.getElementById(`container`).children.length)
+    this.isEmpty = !(document.getElementById(`container`).children.length);
+    this.search = this.search.toLowerCase();
   },
   methods: {
     goBackHome: function() {
