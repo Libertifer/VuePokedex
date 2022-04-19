@@ -9,3 +9,5 @@ The app shows you the available Pokemon from the https://pokeapi.co/api/v2/pokem
 I also used jQuery to take from the JSON only the necessary info, so I don't the one I would not use and the app had run slower than it should.
 
 You are completely free to use the code as you wish.
+
+Also you can try it at https://libertifer.github.io/VuePokedex 
